@@ -6,9 +6,9 @@ import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Select from '../components/Select';
-import { FormSection, MaskedInput } from '../components/FormComponents';
+import { FormSection} from '../components/FormComponents';
 import Toggle from '../components/Toggle';
-import { supabase } from '../utils/supabase';
+
 
 // Schema de validação para o formulário de pedido
 const pedidoSchema = z.object({

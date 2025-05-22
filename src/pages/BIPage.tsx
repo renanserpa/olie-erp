@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { Calendar, Filter, Download, RefreshCw, ChevronDown, ChevronUp, TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
+import { BarChart, Bar, PieChart, Pie, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { Filter, Download, RefreshCw, TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
+
 
 // Tipos de dados
 interface DashboardCard {
@@ -216,7 +216,7 @@ const BIPage: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-medium">Vendas por Período</h3>
           <div className="flex space-x-2">
-            <Button variant="outline" size="xs">
+            <Button variant="outline" size="sm">
               <Download size={14} className="mr-1" />
               Exportar
             </Button>
@@ -267,7 +267,7 @@ const BIPage: React.FC = () => {
                   nameKey="name"
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
-                  {vendasPorCategoria.map((entry, index) => (
+                  {vendasPorCategoria.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -298,7 +298,7 @@ const BIPage: React.FC = () => {
                   nameKey="name"
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
-                  {statusPedidos.map((entry, index) => (
+                  {statusPedidos.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -431,7 +431,6 @@ const BIPage: React.FC = () => {
                     <option value="Produção">Produção</option>
                     <option value="Vendas">Vendas</option>
                     <option value="Marketing">Marketing</option>
-                    <option value="Financeiro">Financeiro</option>
                   </select>
                 </div>
                 
@@ -463,22 +462,27 @@ const BIPage: React.FC = () => {
                     onChange={(e) => setFiltro(prev => ({ ...prev, cliente: e.target.value }))}
                   >
                     <option value="">Todos</option>
-                    <option value="Maria Silva">Maria Silva</option>
-                    <option value="João Oliveira">João Oliveira</option>
-                    <option value="Ana Santos">Ana Santos</option>
-                    <option value="Carlos Ferreira">Carlos Ferreira</option>
-                    <option value="Juliana Costa">Juliana Costa</option>
+                    <option value="1">Maria Silva</option>
+                    <option value="2">João Oliveira</option>
+                    <option value="3">Ana Santos</option>
+                    <option value="4">Carlos Ferreira</option>
+                    <option value="5">Juliana Costa</option>
                   </select>
                 </div>
               </div>
               
               <div className="mt-4 flex justify-end">
-                <button
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                <Button 
+                  variant="outline" 
+                  size="sm"
                   onClick={() => setFiltro({ departamento: '', categoria: '', cliente: '' })}
+                  className="mr-2"
                 >
                   Limpar Filtros
-                </button>
+                </Button>
+                <Button size="sm">
+                  Aplicar Filtros
+                </Button>
               </div>
             </div>
           )}
@@ -486,20 +490,13 @@ const BIPage: React.FC = () => {
         
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="text-gray-500">Carregando dados...</div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary"></div>
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Cards */}
             {renderCards()}
-            
-            {/* Gráfico de Vendas por Período */}
             {renderVendasPorPeriodo()}
-            
-            {/* Gráficos de Distribuição */}
             {renderGraficosDistribuicao()}
-            
-            {/* Rankings */}
             {renderRankings()}
           </div>
         )}

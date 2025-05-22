@@ -3,7 +3,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { AlertTriangle, Clock, CheckCircle, MoreHorizontal, Plus, Filter, Search } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
 
 // Tipos de dados
 interface OrdemProducao {
@@ -274,7 +273,7 @@ const ProducaoKanbanPage: React.FC = () => {
         index={index}
         key={ordem.id}
       >
-        {(provided) => (
+        {(provided: any) => (
           <div
             ref={provided.innerRef}
             {...provided.draggableProps}
@@ -445,7 +444,7 @@ const ProducaoKanbanPage: React.FC = () => {
                 <div key={etapa.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                   <div className="p-3 bg-gray-50 border-b border-gray-200">
                     <h3 className="text-sm font-medium text-gray-700 flex justify-between items-center">
-                      <span>{etapa.nome}</span>
+                      {etapa.nome}
                       <span className="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
                         {ordensPorEtapa[etapa.id]?.length || 0}
                       </span>
@@ -453,11 +452,11 @@ const ProducaoKanbanPage: React.FC = () => {
                   </div>
                   
                   <Droppable droppableId={etapa.id}>
-                    {(provided) => (
+                    {(provided: any) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className="p-2 min-h-[200px] max-h-[calc(100vh-220px)] overflow-y-auto"
+                        className="p-2 min-h-[200px] max-h-[calc(100vh-200px)] overflow-y-auto"
                       >
                         {ordensPorEtapa[etapa.id]?.map((ordem, index) => 
                           renderOrdemCard(ordem, index)

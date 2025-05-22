@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search, CheckCircle, XCircle, Clock, AlertTriangle, FileText, Edit, Trash2, ShoppingCart } from 'lucide-react';
+import { Plus, Filter, Search, CheckCircle, XCircle, Edit, Trash2, ShoppingCart } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
+
 
 // Tipos de dados
 interface OrdemCompra {

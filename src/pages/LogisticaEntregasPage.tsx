@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search, Truck, MapPin, CheckCircle, XCircle, Clock, AlertTriangle, FileText, Edit, Trash2 } from 'lucide-react';
+import { Plus, Filter, Search, Truck, CheckCircle, XCircle, Clock, AlertTriangle, FileText, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
+
 
 // Tipos de dados
 interface Entrega {

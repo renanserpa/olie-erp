@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Filter, Plus, Check, AlertTriangle, Info, Clock, Trash2, Eye, Archive } from 'lucide-react';
+import { Filter, Plus, Check, AlertTriangle, Info, Clock, Trash2, Eye, X } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import { supabase } from '../utils/supabase';
-import { Notification } from '../components/NotificationDropdown';
+import type { Notification } from '../components/NotificationDropdown';
 
 const tiposNotificacao = [
   { value: '', label: 'Todos os tipos' },
@@ -83,7 +83,7 @@ const NotificacoesPage: React.FC = () => {
         schema: 'public', 
         table: 'notificacoes',
         filter: `usuario_id=eq.${userId}`
-      }, (payload) => {
+      }, (payload: any) => {
         if (payload.eventType === 'INSERT') {
           setNotifications(prev => [payload.new as Notification, ...prev]);
           applyFilters([payload.new as Notification, ...notifications]);
@@ -410,7 +410,9 @@ const NotificacoesPage: React.FC = () => {
                             className="text-red-600 hover:text-red-900"
                             onClick={(e) => {
                               e.stopPropagation();
-                              deleteNotification(notification.id);
+                              if (window.confirm('Tem certeza que deseja excluir esta notificação?')) {
+                                deleteNotification(notification.id);
+                              }
                             }}
                           >
                             <Trash2 size={18} />
@@ -426,97 +428,93 @@ const NotificacoesPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Modal de detalhes da notificação */}
+      {/* Modal de detalhes */}
       {showDetailsModal && selectedNotification && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
-            <div className="p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center">
-                  {renderIcon(selectedNotification.tipo)}
-                  <h3 className="text-lg font-semibold text-gray-900 ml-2">
-                    {tiposNotificacao.find(t => t.value === selectedNotification.tipo)?.label || selectedNotification.tipo}
-                  </h3>
-                </div>
-                <button
-                  className="text-gray-400 hover:text-gray-500"
-                  onClick={closeDetailsModal}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              
-              <div className="mt-4">
-                <p className="text-gray-700 text-base">{selectedNotification.mensagem}</p>
-                
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Origem</p>
-                    <p className="text-sm font-medium text-gray-900">
-                      {origensNotificacao.find(o => o.value === selectedNotification.origem)?.label || selectedNotification.origem}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Data/Hora</p>
-                    <p className="text-sm font-medium text-gray-900">
-                      {formatDate(selectedNotification.data_hora)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <p className="text-sm font-medium">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        selectedNotification.status === 'nova' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : selectedNotification.status === 'lida' 
-                            ? 'bg-gray-100 text-gray-800' 
-                            : 'bg-green-100 text-green-800'
-                      }`}>
-                        {statusNotificacao.find(s => s.value === selectedNotification.status)?.label || selectedNotification.status}
-                      </span>
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Prioridade</p>
-                    <p className="text-sm font-medium">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        selectedNotification.prioridade === 'alta' 
-                          ? 'bg-red-100 text-red-800' 
-                          : selectedNotification.prioridade === 'normal' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-green-100 text-green-800'
-                      }`}>
-                        {selectedNotification.prioridade.charAt(0).toUpperCase() + selectedNotification.prioridade.slice(1)}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6 flex justify-end space-x-3">
-                {selectedNotification.status !== 'resolvida' && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      markAsResolved(selectedNotification.id);
-                      closeDetailsModal();
-                    }}
-                  >
-                    <Check size={18} className="mr-1" />
-                    Marcar como resolvida
-                  </Button>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold text-text">Detalhes da Notificação</h2>
+              <button 
+                className="text-gray-500 hover:text-gray-700"
+                onClick={closeDetailsModal}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
+              <div className="flex items-center mb-4">
+                {renderIcon(selectedNotification.tipo)}
+                <span className="ml-2 font-medium">
+                  {tiposNotificacao.find(t => t.value === selectedNotification.tipo)?.label || selectedNotification.tipo}
+                </span>
+                {selectedNotification.prioridade === 'alta' && (
+                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    Alta Prioridade
+                  </span>
                 )}
-                <Button
-                  variant="danger"
+              </div>
+              
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-500 mb-1">Mensagem</h3>
+                <p className="text-base">{selectedNotification.mensagem}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Origem</h3>
+                  <p className="text-base">
+                    {origensNotificacao.find(o => o.value === selectedNotification.origem)?.label || selectedNotification.origem}
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Data/Hora</h3>
+                  <p className="text-base">{formatDate(selectedNotification.data_hora)}</p>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Status</h3>
+                  <p className="text-base">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      selectedNotification.status === 'nova' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : selectedNotification.status === 'lida' 
+                          ? 'bg-gray-100 text-gray-800' 
+                          : 'bg-green-100 text-green-800'
+                    }`}>
+                      {statusNotificacao.find(s => s.value === selectedNotification.status)?.label || selectedNotification.status}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2 p-4 border-t">
+              {selectedNotification.status !== 'resolvida' && (
+                <Button 
+                  variant="outline"
                   onClick={() => {
-                    deleteNotification(selectedNotification.id);
+                    markAsResolved(selectedNotification.id);
                     closeDetailsModal();
                   }}
                 >
-                  <Trash2 size={18} className="mr-1" />
-                  Excluir
+                  <Check size={18} className="mr-1" />
+                  Marcar como Resolvida
                 </Button>
-              </div>
+              )}
+              <Button 
+                variant="danger"
+                onClick={() => {
+                  if (window.confirm('Tem certeza que deseja excluir esta notificação?')) {
+                    deleteNotification(selectedNotification.id);
+                    closeDetailsModal();
+                  }
+                }}
+              >
+                <Trash2 size={18} className="mr-1" />
+                Excluir
+              </Button>
             </div>
           </div>
         </div>

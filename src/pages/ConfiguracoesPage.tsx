@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Users, Bell, Database, Shield, Edit, Save, X, HelpCircle } from 'lucide-react';
+import { Settings, Bell, Database, Shield, Edit, Save, X} from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
+
 
 // Tipos de dados
 interface ConfiguracaoGeral {

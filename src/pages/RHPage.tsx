@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search, Edit, Trash2, FileText, Calendar, Clock, User, Briefcase, DollarSign, Award } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
 
 // Tipos de dados
 interface Funcionario {
@@ -557,334 +556,294 @@ const RHPage: React.FC = () => {
         )}
         
         {/* Lista de funcionários */}
-        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Funcionário
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cargo / Departamento
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Admissão
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Salário
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {funcionariosFiltered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhum funcionário encontrado
-                  </td>
-                </tr>
-              ) : (
-                funcionariosFiltered.map((funcionario) => (
-                  <tr key={funcionario.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Carregando funcionários...</div>
+          </div>
+        ) : (
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            {funcionariosFiltered.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">
+                Nenhum funcionário encontrado
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {funcionariosFiltered.map((funcionario) => (
+                  <li key={funcionario.id}>
+                    <div className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
                           {renderAvatar(funcionario)}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {funcionario.nome}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {funcionario.email}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {funcionario.telefone}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {funcionario.nome}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {funcionario.email}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex space-x-2">
+                          <button
+                            className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                            title="Editar"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                            title="Detalhes"
+                          >
+                            <FileText size={14} />
+                          </button>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {funcionario.cargo}
+                      <div className="mt-2 sm:flex sm:justify-between">
+                        <div className="sm:flex">
+                          <div className="flex items-center text-sm text-gray-500 mr-6">
+                            <Briefcase className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                            {funcionario.cargo}
+                          </div>
+                          <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 mr-6">
+                            <User className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                            {funcionario.departamento}
+                          </div>
+                          <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                            Admissão: {formatarData(funcionario.data_admissao)} ({calcularTempoEmpresa(funcionario.data_admissao)})
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center text-sm sm:mt-0">
+                          <div className="flex items-center text-sm text-gray-500 mr-6">
+                            <DollarSign className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                            {formatarValor(funcionario.salario)}
+                          </div>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            funcionario.status === 'ativo' 
+                              ? 'bg-green-100 text-green-800' 
+                              : funcionario.status === 'ferias'
+                                ? 'bg-blue-100 text-blue-800'
+                                : funcionario.status === 'licenca'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-red-100 text-red-800'
+                          }`}>
+                            {traduzirStatus(funcionario.status)}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {funcionario.departamento}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formatarData(funcionario.data_admissao)}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {calcularTempoEmpresa(funcionario.data_admissao)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatarValor(funcionario.salario)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        funcionario.status === 'ativo' 
-                          ? 'bg-green-100 text-green-800' 
-                          : funcionario.status === 'inativo'
-                            ? 'bg-red-100 text-red-800'
-                            : funcionario.status === 'ferias'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {traduzirStatus(funcionario.status)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Ver detalhes"
-                        >
-                          <FileText size={18} />
-                        </button>
-                        
-                        <button
-                          className="text-gray-600 hover:text-gray-900"
-                          title="Editar"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          title="Excluir"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
     );
   };
   
   // Renderizar conteúdo da aba Férias
   const renderTabFerias = () => {
+    // Encontrar funcionário pelo ID
+    const encontrarFuncionario = (id: number) => {
+      return funcionarios.find(f => f.id === id);
+    };
+    
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-medium text-gray-900">Controle de Férias</h2>
-          
           <Button size="sm">
             <Plus size={18} className="mr-1" />
             Agendar Férias
           </Button>
         </div>
         
-        {/* Lista de férias */}
-        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Funcionário
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Período
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duração
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Observações
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {ferias.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhum registro de férias encontrado
-                  </td>
-                </tr>
-              ) : (
-                ferias.map((feria) => {
-                  const funcionario = funcionarios.find(f => f.id === feria.funcionario_id);
-                  
-                  if (!funcionario) return null;
-                  
-                  // Calcular duração em dias
-                  const dataInicio = new Date(feria.data_inicio);
-                  const dataFim = new Date(feria.data_fim);
-                  const diferencaDias = Math.ceil((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Carregando dados de férias...</div>
+          </div>
+        ) : (
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            {ferias.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">
+                Nenhum registro de férias encontrado
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {ferias.map((ferias) => {
+                  const funcionario = encontrarFuncionario(ferias.funcionario_id);
                   
                   return (
-                    <tr key={feria.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0">
-                            {renderAvatar(funcionario)}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {funcionario.nome}
+                    <li key={ferias.id}>
+                      <div className="px-4 py-4 sm:px-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            {funcionario && renderAvatar(funcionario)}
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {funcionario?.nome || `Funcionário ID ${ferias.funcionario_id}`}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {funcionario?.cargo} - {funcionario?.departamento}
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {funcionario.cargo}
+                          </div>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            ferias.status === 'agendada' 
+                              ? 'bg-yellow-100 text-yellow-800' 
+                              : ferias.status === 'em_andamento'
+                                ? 'bg-blue-100 text-blue-800'
+                                : ferias.status === 'concluida'
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                          }`}>
+                            {traduzirStatusFerias(ferias.status)}
+                          </span>
+                        </div>
+                        <div className="mt-2 sm:flex sm:justify-between">
+                          <div className="sm:flex">
+                            <div className="flex items-center text-sm text-gray-500 mr-6">
+                              <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                              {formatarData(ferias.data_inicio)} a {formatarData(ferias.data_fim)}
+                            </div>
+                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                              <Clock className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                              {(() => {
+                                const inicio = new Date(ferias.data_inicio);
+                                const fim = new Date(ferias.data_fim);
+                                const diffTime = Math.abs(fim.getTime() - inicio.getTime());
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                return `${diffDays} dias`;
+                              })()}
                             </div>
                           </div>
+                          <div className="mt-2 flex space-x-2 sm:mt-0">
+                            <button
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                              title="Editar"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                              title="Detalhes"
+                            >
+                              <FileText size={14} />
+                            </button>
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {formatarData(feria.data_inicio)} a {formatarData(feria.data_fim)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {diferencaDias} dias
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          feria.status === 'agendada' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : feria.status === 'em_andamento'
-                              ? 'bg-blue-100 text-blue-800'
-                              : feria.status === 'concluida'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                        }`}>
-                          {traduzirStatusFerias(feria.status)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {feria.observacoes || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            className="text-gray-600 hover:text-gray-900"
-                            title="Editar"
-                          >
-                            <Edit size={18} />
-                          </button>
-                          
-                          <button
-                            className="text-red-600 hover:text-red-900"
-                            title="Cancelar"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                        {ferias.observacoes && (
+                          <div className="mt-2 text-sm text-gray-500">
+                            <div className="font-medium">Observações:</div>
+                            <div>{ferias.observacoes}</div>
+                          </div>
+                        )}
+                      </div>
+                    </li>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
     );
   };
   
   // Renderizar conteúdo da aba Ponto
   const renderTabPonto = () => {
+    // Encontrar funcionário pelo ID
+    const encontrarFuncionario = (id: number) => {
+      return funcionarios.find(f => f.id === id);
+    };
+    
+    // Formatar hora
+    const formatarHora = (hora?: string) => {
+      return hora || '-';
+    };
+    
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-medium text-gray-900">Registro de Ponto - {new Date().toLocaleDateString('pt-BR')}</h2>
-          
           <Button size="sm">
             <Plus size={18} className="mr-1" />
-            Registrar Ponto Manual
+            Registrar Ponto
           </Button>
         </div>
         
-        {/* Lista de pontos */}
-        <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Funcionário
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Entrada
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Almoço
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Saída
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {pontos.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Carregando registros de ponto...</div>
+          </div>
+        ) : (
+          <div className="bg-white shadow overflow-hidden rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhum registro de ponto encontrado
-                  </td>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Funcionário
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Entrada
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Saída Almoço
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Retorno Almoço
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Saída
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Horas
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="relative px-6 py-3">
+                    <span className="sr-only">Ações</span>
+                  </th>
                 </tr>
-              ) : (
-                pontos.map((ponto) => {
-                  const funcionario = funcionarios.find(f => f.id === ponto.funcionario_id);
-                  
-                  if (!funcionario) return null;
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {pontos.map((ponto) => {
+                  const funcionario = encontrarFuncionario(ponto.funcionario_id);
                   
                   return (
-                    <tr key={ponto.id} className="hover:bg-gray-50">
+                    <tr key={ponto.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0">
-                            {renderAvatar(funcionario)}
-                          </div>
+                          {funcionario && renderAvatar(funcionario)}
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {funcionario.nome}
+                              {funcionario?.nome || `Funcionário ID ${ponto.funcionario_id}`}
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {funcionario.cargo}
+                            <div className="text-sm text-gray-500">
+                              {funcionario?.cargo}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ponto.entrada || '-'}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatarHora(ponto.entrada)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ponto.saida_almoco ? `${ponto.saida_almoco} - ${ponto.retorno_almoco || '?'}` : '-'}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatarHora(ponto.saida_almoco)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ponto.saida || '-'}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatarHora(ponto.retorno_almoco)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatarHora(ponto.saida)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {ponto.horas_trabalhadas ? `${ponto.horas_trabalhadas}h` : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           ponto.status === 'completo' 
                             ? 'bg-green-100 text-green-800' 
                             : ponto.status === 'incompleto'
@@ -895,63 +854,34 @@ const RHPage: React.FC = () => {
                         }`}>
                           {traduzirStatusPonto(ponto.status)}
                         </span>
-                        {ponto.justificativa && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {ponto.justificativa}
-                          </div>
-                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end space-x-2">
-                          {ponto.status === 'incompleto' && (
-                            <button
-                              className="text-blue-600 hover:text-blue-900"
-                              title="Registrar"
-                            >
-                              <Clock size={18} />
-                            </button>
-                          )}
-                          
                           <button
-                            className="text-gray-600 hover:text-gray-900"
+                            className="text-blue-600 hover:text-blue-900"
                             title="Editar"
                           >
-                            <Edit size={18} />
+                            <Edit size={16} />
                           </button>
-                          
-                          {ponto.status === 'ausente' && (
+                          {ponto.status === 'incompleto' && (
                             <button
-                              className="text-blue-600 hover:text-blue-900"
-                              title="Justificar"
+                              className="text-green-600 hover:text-green-900"
+                              title="Registrar Saída"
                             >
-                              <FileText size={18} />
+                              <Clock size={16} />
                             </button>
                           )}
                         </div>
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     );
-  };
-  
-  // Renderizar conteúdo da aba ativa
-  const renderActiveTabContent = () => {
-    switch (activeTab) {
-      case 'funcionarios':
-        return renderTabFuncionarios();
-      case 'ferias':
-        return renderTabFerias();
-      case 'ponto':
-        return renderTabPonto();
-      default:
-        return null;
-    }
   };
   
   return (
@@ -959,55 +889,53 @@ const RHPage: React.FC = () => {
       <Sidebar userProfile={userProfile} />
       
       <div className="flex-1 overflow-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-text">Recursos Humanos</h1>
-        </div>
-        
-        <div className="flex border-b border-gray-200 mb-6">
-          <button
-            className={`py-4 px-6 font-medium text-sm ${
-              activeTab === 'funcionarios' 
-                ? 'border-b-2 border-secondary text-secondary' 
-                : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-            onClick={() => setActiveTab('funcionarios')}
-          >
-            <User size={16} className="inline mr-2" />
-            Funcionários
-          </button>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h1 className="text-2xl font-bold text-text mb-6">Recursos Humanos</h1>
           
-          <button
-            className={`py-4 px-6 font-medium text-sm ${
-              activeTab === 'ferias' 
-                ? 'border-b-2 border-secondary text-secondary' 
-                : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-            onClick={() => setActiveTab('ferias')}
-          >
-            <Calendar size={16} className="inline mr-2" />
-            Férias
-          </button>
-          
-          <button
-            className={`py-4 px-6 font-medium text-sm ${
-              activeTab === 'ponto' 
-                ? 'border-b-2 border-secondary text-secondary' 
-                : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-            onClick={() => setActiveTab('ponto')}
-          >
-            <Clock size={16} className="inline mr-2" />
-            Ponto
-          </button>
-        </div>
-        
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-gray-500">Carregando dados...</div>
+          {/* Tabs */}
+          <div className="border-b border-gray-200 mb-6">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                className={`${
+                  activeTab === 'funcionarios'
+                    ? 'border-secondary text-secondary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                onClick={() => setActiveTab('funcionarios')}
+              >
+                <User size={16} className="inline mr-1" />
+                Funcionários
+              </button>
+              <button
+                className={`${
+                  activeTab === 'ferias'
+                    ? 'border-secondary text-secondary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                onClick={() => setActiveTab('ferias')}
+              >
+                <Calendar size={16} className="inline mr-1" />
+                Férias
+              </button>
+              <button
+                className={`${
+                  activeTab === 'ponto'
+                    ? 'border-secondary text-secondary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                onClick={() => setActiveTab('ponto')}
+              >
+                <Clock size={16} className="inline mr-1" />
+                Ponto
+              </button>
+            </nav>
           </div>
-        ) : (
-          renderActiveTabContent()
-        )}
+          
+          {/* Conteúdo da tab ativa */}
+          {activeTab === 'funcionarios' && renderTabFuncionarios()}
+          {activeTab === 'ferias' && renderTabFerias()}
+          {activeTab === 'ponto' && renderTabPonto()}
+        </div>
       </div>
     </div>
   );

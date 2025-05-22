@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,8 +6,9 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import Toggle from '../components/Toggle';
 import Button from '../components/Button';
-import { FormSection, MaskedInput } from '../components/FormComponents';
+import { FormSection} from '../components/FormComponents';
 import Sidebar from '../components/Sidebar';
+import InputMask from 'react-input-mask';
 
 // Schema de validação para o formulário de fornecedor
 const fornecedorSchema = z.object({
@@ -86,13 +87,13 @@ const FornecedorFormPage: React.FC = () => {
   // Simulando um usuário com perfil Admin para demonstração
   const userProfile = 'Admin' as const;
   
-  const [cnpjValue, setCnpjValue] = React.useState('');
-  const [telefoneValue, setTelefoneValue] = React.useState('');
-  const [cepValue, setCepValue] = React.useState('');
-  const [contatoTelefoneValue, setContatoTelefoneValue] = React.useState('');
-  const [ativoValue, setAtivoValue] = React.useState(true);
+  const [cnpjValue, setCnpjValue] = useState('');
+  const [telefoneValue, setTelefoneValue] = useState('');
+  const [cepValue, setCepValue] = useState('');
+  const [contatoTelefoneValue, setContatoTelefoneValue] = useState('');
+  const [ativoValue, setAtivoValue] = useState(true);
   
-  const { register, handleSubmit, formState: { errors } } = useForm<FornecedorFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FornecedorFormData>({
     resolver: zodResolver(fornecedorSchema),
     defaultValues: {
       ativo: true
@@ -105,7 +106,36 @@ const FornecedorFormPage: React.FC = () => {
     alert('Fornecedor cadastrado com sucesso!');
   };
   
-  return (
+  
+  // Registrar campos de máscara
+  useEffect(() => {
+    register('cnpj');
+    register('telefone');
+    register('cep');
+    register('contato_telefone');
+  }, [register]);
+  
+
+  const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCnpjValue(e.target.value);
+    setValue('cnpj', e.target.value);
+  };
+
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTelefoneValue(e.target.value);
+    setValue('telefone', e.target.value);
+  };
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCepValue(e.target.value);
+    setValue('cep', e.target.value);
+  };
+
+  const handleContatoTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContatoTelefoneValue(e.target.value);
+    setValue('contato_telefone', e.target.value);
+  };
+return (
     <div className="flex h-screen bg-primary">
       <Sidebar userProfile={userProfile} />
       
@@ -136,12 +166,11 @@ const FornecedorFormPage: React.FC = () => {
                 <InputMask
                   mask="99.999.999/9999-99"
                   value={cnpjValue}
-                  onChange={(e) => setCnpjValue(e.target.value)}
+                  onChange={handleCnpjChange}
                   className={`block w-full px-3 py-2 bg-white border ${
                     errors.cnpj ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary`}
                   placeholder="00.000.000/0000-00"
-                  {...register('cnpj')}
                 />
                 {errors.cnpj && (
                   <p className="mt-1 text-sm text-red-600">{errors.cnpj.message}</p>
@@ -160,12 +189,11 @@ const FornecedorFormPage: React.FC = () => {
                 <InputMask
                   mask="(99) 99999-9999"
                   value={telefoneValue}
-                  onChange={(e) => setTelefoneValue(e.target.value)}
+                  onChange={handleTelefoneChange}
                   className={`block w-full px-3 py-2 bg-white border ${
                     errors.telefone ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary`}
                   placeholder="(00) 00000-0000"
-                  {...register('telefone')}
                 />
                 {errors.telefone && (
                   <p className="mt-1 text-sm text-red-600">{errors.telefone.message}</p>
@@ -227,12 +255,11 @@ const FornecedorFormPage: React.FC = () => {
                 <InputMask
                   mask="99999-999"
                   value={cepValue}
-                  onChange={(e) => setCepValue(e.target.value)}
+                  onChange={handleCepChange}
                   className={`block w-full px-3 py-2 bg-white border ${
                     errors.cep ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary`}
                   placeholder="00000-000"
-                  {...register('cep')}
                 />
                 {errors.cep && (
                   <p className="mt-1 text-sm text-red-600">{errors.cep.message}</p>
@@ -296,12 +323,11 @@ const FornecedorFormPage: React.FC = () => {
                 <InputMask
                   mask="(99) 99999-9999"
                   value={contatoTelefoneValue}
-                  onChange={(e) => setContatoTelefoneValue(e.target.value)}
+                  onChange={handleContatoTelefoneChange}
                   className={`block w-full px-3 py-2 bg-white border ${
                     errors.contato_telefone ? 'border-red-500' : 'border-gray-300'
                   } rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary`}
                   placeholder="(00) 00000-0000"
-                  {...register('contato_telefone')}
                 />
                 {errors.contato_telefone && (
                   <p className="mt-1 text-sm text-red-600">{errors.contato_telefone.message}</p>

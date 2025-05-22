@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Filter, Search, DollarSign, CreditCard, FileText, Edit, Trash2, Calendar, ArrowUpRight, ArrowDownRight, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Plus, Filter, Search, DollarSign, FileText, Edit, Trash2, Calendar, ArrowUpRight, ArrowDownRight, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
+
 
 // Tipos de dados
 interface Lancamento {

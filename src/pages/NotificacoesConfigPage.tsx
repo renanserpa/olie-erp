@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, X, AlertTriangle, Info, Clock, Check } from 'lucide-react';
+import { Save, AlertTriangle, Info, Clock, Check, Send } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import Input from '../components/Input';
-import Select from '../components/Select';
 import { FormSection } from '../components/FormComponents';
-import { supabase } from '../utils/supabase';
 
 // Tipos de notificações automáticas
 const notificacoesAutomaticas = [
@@ -132,16 +129,6 @@ const NotificacoesConfigPage: React.FC = () => {
       // Em um ambiente real, isso seria salvo no banco de dados
       // Simulando o envio para cada destinatário
       for (const usuarioId of novaNotificacao.destinatarios) {
-        const notificacao = {
-          tipo: novaNotificacao.tipo,
-          mensagem: novaNotificacao.mensagem,
-          origem: novaNotificacao.origem,
-          data_hora: new Date().toISOString(),
-          status: 'nova',
-          usuario_id: usuarioId,
-          prioridade: novaNotificacao.prioridade
-        };
-        
         // Aqui seria o código para salvar no Supabase
         // const { error } = await supabase.from('notificacoes').insert([notificacao]);
         // if (error) throw error;
@@ -402,11 +389,11 @@ const NotificacoesConfigPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {config.nome}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 text-sm text-gray-500">
                           {config.descricao}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {origensNotificacao.find(o => o.value === config.modulo)?.label || config.modulo}
+                          {config.modulo.charAt(0).toUpperCase() + config.modulo.slice(1)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <label className="inline-flex items-center">
@@ -429,7 +416,7 @@ const NotificacoesConfigPage: React.FC = () => {
               
               <div className="mt-4 text-sm text-gray-500">
                 <p>As notificações automáticas são enviadas com base em eventos do sistema.</p>
-                <p>Ative ou desative conforme necessário e clique em "Salvar Configurações".</p>
+                <p>Ative ou desative conforme necessário para controlar o fluxo de notificações.</p>
               </div>
             </div>
           )}

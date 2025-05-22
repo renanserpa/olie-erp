@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search, Tag, Edit, Trash2, FileText, Image, BarChart2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
-import { supabase } from '../utils/supabase';
 
 // Tipos de dados
 interface Produto {
@@ -438,83 +437,97 @@ const ProdutosPage: React.FC = () => {
                         <h3 className="text-lg font-medium text-gray-900 truncate" title={produto.nome}>
                           {produto.nome}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-sm text-gray-500 truncate" title={produto.codigo}>
                           Código: {produto.codigo}
                         </p>
                       </div>
-                      <div className="text-lg font-semibold text-secondary">
-                        {formatarValor(produto.preco_venda)}
-                      </div>
-                    </div>
-                    
-                    <div className="mt-2">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Tag size={16} className="mr-1 text-gray-400" />
-                        {produto.categoria?.nome}
-                      </div>
-                      
-                      <div className="mt-2 flex justify-between items-center">
-                        <div className="text-sm">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            produto.estoque_atual === 0
-                              ? 'bg-red-100 text-red-800'
-                              : produto.estoque_atual < (produto.estoque_minimo || 0)
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-green-100 text-green-800'
-                          }`}>
-                            {produto.estoque_atual === 0
-                              ? 'Sem estoque'
-                              : produto.estoque_atual < (produto.estoque_minimo || 0)
-                                ? 'Estoque baixo'
-                                : 'Estoque OK'}
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {produto.estoque_atual} unid.
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 flex justify-between text-sm text-gray-500">
                       <div>
-                        <span className="font-medium">Custo:</span> {produto.custo_producao ? formatarValor(produto.custo_producao) : '-'}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {produto.categoria?.nome}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Preço de Venda</p>
+                        <p className="text-sm font-medium text-gray-900">{formatarValor(produto.preco_venda)}</p>
                       </div>
                       <div>
-                        <span className="font-medium">Tempo:</span> {formatarTempo(produto.tempo_producao)}
+                        <p className="text-xs text-gray-500">Custo de Produção</p>
+                        <p className="text-sm font-medium text-gray-900">{produto.custo_producao ? formatarValor(produto.custo_producao) : '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Tempo de Produção</p>
+                        <p className="text-sm font-medium text-gray-900">{formatarTempo(produto.tempo_producao)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Estoque Atual</p>
+                        <p className={`text-sm font-medium ${
+                          produto.estoque_atual === 0
+                            ? 'text-red-600'
+                            : produto.estoque_atual < (produto.estoque_minimo || 0)
+                              ? 'text-yellow-600'
+                              : 'text-green-600'
+                        }`}>
+                          {produto.estoque_atual} {produto.estoque_minimo && produto.estoque_atual < produto.estoque_minimo && '(Baixo)'}
+                        </p>
                       </div>
                     </div>
                     
-                    <div className="mt-4 flex justify-between space-x-2">
-                      <button
-                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
-                      >
-                        <FileText size={16} className="mr-1" />
-                        Detalhes
-                      </button>
+                    <div className="mt-4 flex justify-between">
+                      <div className="flex space-x-2">
+                        <button
+                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                          title="Editar"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                          title="Detalhes"
+                        >
+                          <FileText size={14} />
+                        </button>
+                        <button
+                          className="inline-flex items-center px-2 py-1 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+                          title="Estatísticas"
+                        >
+                          <BarChart2 size={14} />
+                        </button>
+                      </div>
                       
-                      <button
-                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
-                      >
-                        <BarChart2 size={16} className="mr-1" />
-                        Vendas
-                      </button>
-                    </div>
-                    
-                    <div className="mt-2 flex justify-between space-x-2">
-                      <button
-                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
-                      >
-                        <Edit size={16} className="mr-1" />
-                        Editar
-                      </button>
-                      
-                      <button
-                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        onClick={() => excluirProduto(produto.id)}
-                      >
-                        <Trash2 size={16} className="mr-1" />
-                        Excluir
-                      </button>
+                      <div className="flex space-x-2">
+                        {produto.status !== 'ativo' ? (
+                          <button
+                            className="inline-flex items-center px-2 py-1 border border-green-300 rounded-md text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            onClick={() => atualizarStatus(produto.id, 'ativo')}
+                            title="Ativar"
+                          >
+                            Ativar
+                          </button>
+                        ) : (
+                          <button
+                            className="inline-flex items-center px-2 py-1 border border-yellow-300 rounded-md text-xs font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                            onClick={() => atualizarStatus(produto.id, 'inativo')}
+                            title="Inativar"
+                          >
+                            Inativar
+                          </button>
+                        )}
+                        
+                        <button
+                          className="inline-flex items-center px-2 py-1 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                          onClick={() => {
+                            if (window.confirm(`Tem certeza que deseja excluir o produto "${produto.nome}"?`)) {
+                              excluirProduto(produto.id);
+                            }
+                          }}
+                          title="Excluir"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
