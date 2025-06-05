@@ -3,7 +3,7 @@ import {
   Plus, Edit, Trash2, Filter, Search, 
   User, Phone, Mail, MapPin, FileText, 
   ChevronDown, ChevronUp, ShoppingBag, Clock,
-  CreditCard, Tag, Heart
+  CreditCard, Tag, Heart, Truck
 } from 'lucide-react';
 
 // Interfaces para o módulo de Clientes

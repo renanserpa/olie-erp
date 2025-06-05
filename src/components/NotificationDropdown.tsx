@@ -11,7 +11,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Bell, Check, AlertTriangle, Info, Clock } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
+import { RealtimePostgresInsertPayload } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabaseClient";
 
 export interface Notification {
   id: number;
@@ -62,8 +63,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ userId }) =
           table: "notificacoes",
           filter: `usuario_id=eq.${userId}`,
         },
-        (payload) => {
-          setNotifications((prev) => [payload.new as Notification, ...prev]);
+        (payload: RealtimePostgresInsertPayload<Notification>) => {
+          setNotifications((prev) => [payload.new, ...prev]);
         }
       )
       .subscribe();
