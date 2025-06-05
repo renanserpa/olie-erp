@@ -15,8 +15,11 @@ export const Select: React.FC<SelectProps> = ({
   fullWidth = true,
   searchable = false,
   className,
+  id,
   ...props
 }) => {
+  const generatedId = React.useId();
+  const selectId = id || generatedId;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState<string | undefined>(props.value as string);
@@ -47,13 +50,14 @@ export const Select: React.FC<SelectProps> = ({
   if (searchable) {
     return (
       <div className={`mb-4 relative ${fullWidth ? 'w-full' : ''}`}>
-        <label className="block text-sm font-medium text-text mb-1">
+        <label htmlFor={selectId} className="block text-sm font-medium text-text mb-1">
           {label}
           {props.required && <span className="text-red-500 ml-1">*</span>}
         </label>
-        
+
         <div className="relative">
           <button
+            id={selectId}
             type="button"
             className={`flex justify-between items-center w-full px-3 py-2 bg-white border ${
               error ? 'border-red-500' : 'border-gray-300'
@@ -111,12 +115,13 @@ export const Select: React.FC<SelectProps> = ({
   
   return (
     <div className={`mb-4 ${fullWidth ? 'w-full' : ''}`}>
-      <label className="block text-sm font-medium text-text mb-1">
+      <label htmlFor={selectId} className="block text-sm font-medium text-text mb-1">
         {label}
         {props.required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      
+
       <select
+        id={selectId}
         className={`block w-full px-3 py-2 bg-white border ${
           error ? 'border-red-500' : 'border-gray-300'
         } rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary ${className || ''}`}
