@@ -193,15 +193,21 @@ const ProdutosPage: React.FC = () => {
     }
     
     // Filtro por estoque
-    if (filtro.estoque) {
-      if (filtro.estoque === 'sem_estoque' && produto.estoque_atual > 0) {
-        return false;
-      } else if (filtro.estoque === 'estoque_baixo' && (produto.estoque_atual >= produto.estoque_minimo || produto.estoque_atual === 0)) {
-        return false;
-      } else if (filtro.estoque === 'estoque_ok' && (produto.estoque_atual < produto.estoque_minimo || produto.estoque_atual === 0)) {
-        return false;
+      if (filtro.estoque) {
+        if (filtro.estoque === 'sem_estoque' && produto.estoque_atual > 0) {
+          return false;
+        } else if (
+          filtro.estoque === 'estoque_baixo' &&
+          (produto.estoque_atual >= (produto.estoque_minimo ?? 0) || produto.estoque_atual === 0)
+        ) {
+          return false;
+        } else if (
+          filtro.estoque === 'estoque_ok' &&
+          (produto.estoque_atual < (produto.estoque_minimo ?? 0) || produto.estoque_atual === 0)
+        ) {
+          return false;
+        }
       }
-    }
     
     // Filtro por busca (nome, código ou descrição)
     if (filtro.busca) {

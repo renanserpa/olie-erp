@@ -729,7 +729,7 @@ const LogisticaModule: React.FC = () => {
                   <div className="mb-6">
                     <div className="absolute -left-2.5 top-1 w-5 h-5 bg-blue-500 rounded-full border-4 border-white"></div>
                     <p className="text-sm font-medium">Objeto em trânsito - por favor aguarde</p>
-                    <p className="text-xs text-gray-500">{formatarData(new Date(new Date(entregaSelecionada.dataEnvio).setDate(new Date(entregaSelecionada.dataEnvio).getDate() + 1)).toISOString())} - Unidade de Tratamento, Origem -> Destino</p>
+                    <p className="text-xs text-gray-500">{formatarData(new Date(new Date(entregaSelecionada.dataEnvio).setDate(new Date(entregaSelecionada.dataEnvio).getDate() + 1)).toISOString())} - Unidade de Tratamento, Origem {'>'} Destino</p>
                   </div>
                   {/* Evento 4 */}
                   <div>

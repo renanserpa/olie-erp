@@ -314,13 +314,14 @@ const RHPage: React.FC = () => {
             retorno_almoco: '13:00',
             status: 'incompleto'
           },
-          {
-            id: 5,
-            funcionario_id: 5,
-            data: '2025-05-19',
-            status: 'justificado',
-            justificativa: 'Licença médica'
-          }
+        {
+          id: 5,
+          funcionario_id: 5,
+          data: '2025-05-19',
+          entrada: '08:00',
+          status: 'justificado',
+          justificativa: 'Licença médica'
+        }
         ];
         
         setFuncionarios(funcionariosSimulados);

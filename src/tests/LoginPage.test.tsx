@@ -80,7 +80,7 @@ describe('LoginPage', () => {
     expect(senhaInput).toHaveAttribute('type', 'password');
     
     // Clica no botão de mostrar senha
-    const toggleButton = senhaInput.nextElementSibling;
+    const toggleButton = senhaInput.nextElementSibling as HTMLElement;
     fireEvent.click(toggleButton);
     
     // Verifica se o campo de senha mudou para type="text"

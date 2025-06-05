@@ -27,7 +27,7 @@ import {
   Droppable,
   DropResult,
 } from "@hello-pangea/dnd";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 import { GripVertical } from "lucide-react";
 
 // ---------------------------------------------
