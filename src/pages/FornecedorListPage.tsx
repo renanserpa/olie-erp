@@ -177,11 +177,12 @@ const FornecedorListPage: React.FC = () => {
               
               <form onSubmit={handleSubmit(onSubmitFilter)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="termo_busca" className="block text-sm font-medium text-text mb-1">
                     Busca
                   </label>
                   <div className="relative">
                     <input
+                      id="termo_busca"
                       type="text"
                       className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
                       placeholder="Nome, Razão Social ou CNPJ"
@@ -194,10 +195,11 @@ const FornecedorListPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="categoria" className="block text-sm font-medium text-text mb-1">
                     Categoria
                   </label>
                   <select
+                    id="categoria"
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
                     {...register('categoria')}
                   >
@@ -210,10 +212,11 @@ const FornecedorListPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="estado" className="block text-sm font-medium text-text mb-1">
                     Estado
                   </label>
                   <select
+                    id="estado"
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary"
                     {...register('estado')}
                   >

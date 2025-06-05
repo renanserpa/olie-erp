@@ -160,10 +160,11 @@ return (
               />
               
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
+                <label htmlFor="cnpj" className="block text-sm font-medium text-text mb-1">
                   CNPJ <span className="text-red-500">*</span>
                 </label>
                 <InputMask
+                  id="cnpj"
                   mask="99.999.999/9999-99"
                   value={cnpjValue}
                   onChange={handleCnpjChange}
@@ -183,10 +184,11 @@ return (
               />
               
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
+                <label htmlFor="telefone" className="block text-sm font-medium text-text mb-1">
                   Telefone <span className="text-red-500">*</span>
                 </label>
                 <InputMask
+                  id="telefone"
                   mask="(99) 99999-9999"
                   value={telefoneValue}
                   onChange={handleTelefoneChange}
@@ -317,10 +319,11 @@ return (
               />
               
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
+                <label htmlFor="contato_telefone" className="block text-sm font-medium text-text mb-1">
                   Telefone <span className="text-red-500">*</span>
                 </label>
                 <InputMask
+                  id="contato_telefone"
                   mask="(99) 99999-9999"
                   value={contatoTelefoneValue}
                   onChange={handleContatoTelefoneChange}

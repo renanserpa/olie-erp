@@ -17,7 +17,7 @@ describe('FornecedorListPage', () => {
     );
     
     // Verifica se os elementos principais estão presentes
-    expect(screen.getByText('Fornecedores')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Fornecedores' })).toBeInTheDocument();
     expect(screen.getByText('Novo Fornecedor')).toBeInTheDocument();
     expect(screen.getByText('Filtros')).toBeInTheDocument();
     
@@ -67,13 +67,13 @@ describe('FornecedorListPage', () => {
     
     // Abre o painel de filtros
     fireEvent.click(screen.getByText('Filtros'));
-    
+
     // Preenche o campo de busca
     const busca = screen.getByPlaceholderText('Nome, Razão Social ou CNPJ');
     fireEvent.change(busca, { target: { value: 'Tecidos' } });
-    
+
     // Seleciona a categoria
-    const categoria = screen.getByLabelText('Categoria');
+    const categoria = await screen.findByLabelText('Categoria');
     fireEvent.change(categoria, { target: { value: 'Tecidos' } });
     
     // Marca a opção "Apenas ativos"

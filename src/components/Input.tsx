@@ -39,15 +39,28 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div className={["mb-4", fullWidth ? "w-full" : ""].join(" ")}>
-      <label className="mb-1 block text-sm font-medium text-gray-700">
+      {/* Conecta label ao input para melhor acessibilidade */}
+      <label
+        htmlFor={props.id ?? props.name?.toString()}
+        className="mb-1 block text-sm font-medium text-gray-700"
+      >
         {label}
         {props.required && <span className="ml-1 text-red-500">*</span>}
       </label>
 
       {mask ? (
-        <InputMask mask={mask} className={inputClasses} {...props} />
+        <InputMask
+          id={props.id ?? props.name?.toString()}
+          mask={mask}
+          className={inputClasses}
+          {...props}
+        />
       ) : (
-        <input className={inputClasses} {...props} />
+        <input
+          id={props.id ?? props.name?.toString()}
+          className={inputClasses}
+          {...props}
+        />
       )}
 
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
